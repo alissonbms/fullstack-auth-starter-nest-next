@@ -5,6 +5,12 @@ import { ConfigService } from "@nestjs/config";
 export class CustomConfigService {
   constructor(private readonly configService: ConfigService) {}
 
+  getNodeEnv(): "development" | "production" | "test" | "provision" {
+    return this.configService.getOrThrow<
+      "development" | "production" | "test" | "provision"
+    >("NODE_ENV");
+  }
+
   getPort(): number {
     return this.configService.getOrThrow<number>("PORT");
   }
@@ -13,10 +19,12 @@ export class CustomConfigService {
     return this.configService.getOrThrow<string>("DATABASE_URL");
   }
 
-  getNodeEnv(): "development" | "production" | "test" | "provision" {
-    return this.configService.getOrThrow<
-      "development" | "production" | "test" | "provision"
-    >("NODE_ENV");
+  getClientUrl(): string {
+    return this.configService.getOrThrow<string>("CLIENT_URL");
+  }
+
+  getServerUrl(): string {
+    return this.configService.getOrThrow<string>("SERVER_URL");
   }
 
   getMailHost(): string {
@@ -37,5 +45,21 @@ export class CustomConfigService {
 
   getMailFrom(): string {
     return this.configService.getOrThrow<string>("MAIL_FROM");
+  }
+
+  getJwtAccessSecret(): string {
+    return this.configService.getOrThrow<string>("JWT_ACCESS_SECRET");
+  }
+
+  getJwtConfirmationSecret(): string {
+    return this.configService.getOrThrow<string>("JWT_CONFIRMATION_SECRET");
+  }
+
+  getJwtChangeEmailSecret(): string {
+    return this.configService.getOrThrow<string>("JWT_CHANGE_EMAIL_SECRET");
+  }
+
+  getJwtResetPasswordSecret(): string {
+    return this.configService.getOrThrow<string>("JWT_RESET_PASSWORD_SECRET");
   }
 }

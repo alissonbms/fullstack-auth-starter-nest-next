@@ -30,6 +30,12 @@ class EnvironmentVariables {
   DATABASE_URL: string;
 
   @IsString()
+  CLIENT_URL: string;
+
+  @IsString()
+  SERVER_URL: string;
+
+  @IsString()
   MAIL_HOST: string;
 
   @IsNumber()
@@ -45,6 +51,18 @@ class EnvironmentVariables {
 
   @IsString()
   MAIL_FROM: string;
+
+  @IsString()
+  JWT_ACCESS_SECRET: string;
+
+  @IsString()
+  JWT_CONFIRMATION_SECRET: string;
+
+  @IsString()
+  JWT_CHANGE_EMAIL_SECRET: string;
+
+  @IsString()
+  JWT_RESET_PASSWORD_SECRET: string;
 }
 
 function formatErrors(errors: ValidationError[]): string {
