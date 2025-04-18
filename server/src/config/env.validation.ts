@@ -2,6 +2,7 @@ import { plainToInstance } from "class-transformer";
 import {
   IsEnum,
   IsNumber,
+  IsString,
   IsUrl,
   Max,
   Min,
@@ -27,6 +28,20 @@ class EnvironmentVariables {
 
   @IsUrl({ protocols: ["postgresql"], require_tld: false })
   DATABASE_URL: string;
+
+  @IsString()
+  MAIL_HOST: string;
+
+  @IsNumber()
+  @Min(1)
+  @Max(65535)
+  MAIL_PORT: number;
+
+  @IsString()
+  MAIL_USER: string;
+
+  @IsString()
+  MAIL_PASS: string;
 }
 
 function formatErrors(errors: ValidationError[]): string {

@@ -18,4 +18,20 @@ export class CustomConfigService {
       "development" | "production" | "test" | "provision"
     >("NODE_ENV");
   }
+
+  getMailHost(): string {
+    return this.configService.getOrThrow<string>("MAIL_HOST");
+  }
+
+  getMailPort(): number {
+    return this.configService.getOrThrow<number>("MAIL_PORT");
+  }
+
+  getMailUser(): string {
+    return this.configService.getOrThrow<string>("MAIL_USER");
+  }
+
+  getMailPass(): string {
+    return this.configService.getOrThrow<string>("MAIL_PASS");
+  }
 }
