@@ -4,6 +4,7 @@ import { LoggerModule } from "nestjs-pino";
 import { validate } from "./config/env.validation";
 import { CustomConfigModule } from "./config/custom-config.module";
 import { CustomConfigService } from "./config/custom-config.service";
+import { UserModule } from "./user/user.module";
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CustomConfigService } from "./config/custom-config.service";
       },
       inject: [CustomConfigService],
     }),
+    UserModule,
   ],
   controllers: [],
   providers: [],
