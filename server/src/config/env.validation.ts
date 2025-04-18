@@ -42,6 +42,9 @@ class EnvironmentVariables {
 
   @IsString()
   MAIL_PASS: string;
+
+  @IsString()
+  MAIL_FROM: string;
 }
 
 function formatErrors(errors: ValidationError[]): string {

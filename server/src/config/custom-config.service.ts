@@ -34,4 +34,8 @@ export class CustomConfigService {
   getMailPass(): string {
     return this.configService.getOrThrow<string>("MAIL_PASS");
   }
+
+  getMailFrom(): string {
+    return this.configService.getOrThrow<string>("MAIL_FROM");
+  }
 }

@@ -8,6 +8,7 @@ import { UserModule } from "./user/user.module";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import { PrismaModule } from "./prisma/prisma.module";
+import { join } from "path";
 
 @Module({
   imports: [
@@ -51,10 +52,10 @@ import { PrismaModule } from "./prisma/prisma.module";
             },
           },
           defaults: {
-            from: "Bazaarium Verse <alissonnewdev@gmail.com>",
+            from: customConfigService.getMailFrom(),
           },
           template: {
-            dir: __dirname + "/mailer/templates",
+            dir: join(process.cwd(), "src", "mailer", "templates"),
             adapter: new HandlebarsAdapter(),
             options: { strict: true },
           },
