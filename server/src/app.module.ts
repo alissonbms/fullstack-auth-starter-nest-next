@@ -7,6 +7,7 @@ import { CustomConfigService } from "./config/custom-config.service";
 import { UserModule } from "./user/user.module";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
+import { PrismaModule } from "./prisma/prisma.module";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handleba
       },
       inject: [CustomConfigService],
     }),
+    PrismaModule,
     MailerModule.forRootAsync({
       imports: [CustomConfigModule],
       useFactory: (customConfigService: CustomConfigService) => {
