@@ -59,4 +59,12 @@ export class UserService {
       throw new InternalServerErrorException();
     }
   }
+
+  async getUserByEmail(email: string) {
+    return this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
 }

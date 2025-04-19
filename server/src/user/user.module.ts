@@ -21,7 +21,13 @@ import { MailerService } from "src/mailer/mailer.service";
       inject: [CustomConfigService],
     }),
   ],
-  providers: [UserService, PrismaService, HashService, MailerService],
+  providers: [
+    UserService,
+    PrismaService,
+    HashService,
+    MailerService,
+    CustomConfigService,
+  ],
   controllers: [UserController],
 })
 export class UserModule {}
