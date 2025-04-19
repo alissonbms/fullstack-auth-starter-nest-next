@@ -38,7 +38,7 @@ export class AuthService {
       const { token } =
         this.tokenService.generateConfirmationToken(tokenPayload);
 
-      const confirmLink = `${this.customConfigService.getServerUrl()}/confirm-email?token=${token}`;
+      const confirmLink = `${this.customConfigService.getServerUrl()}/auth/confirm-email?token=${token}`;
 
       await this.mailerService.sendEmailConfirmation(
         newUser.username,

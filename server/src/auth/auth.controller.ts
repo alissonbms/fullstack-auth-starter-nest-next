@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Post, Query, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { CurrentUser } from "./decorators/current-user.decorator";
@@ -16,8 +16,8 @@ export class AuthController {
   }
 
   @Post("confirm-email")
-  async confirmEmail(@Body() body: { token: string }) {
-    return await this.authService.confirmEmail(body.token);
+  async confirmEmail(@Query("token") token: string) {
+    return await this.authService.confirmEmail(token);
   }
 
   @UseGuards(LocalAuthGuard)
