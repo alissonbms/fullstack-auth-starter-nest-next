@@ -100,6 +100,12 @@ export class AuthService {
   }
 
   login(user: User, response: Response) {
+    if (!user.emailVerified) {
+      throw new UnauthorizedException(
+        "Please verify your email before logging in.",
+      );
+    }
+
     const tokenPayload: TokenPayload = {
       sub: user.id,
     };
