@@ -4,40 +4,68 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
-import { JwtService } from "@nestjs/jwt";
 import { CustomConfigService } from "src/config/custom-config.service";
 import { UserService } from "src/user/user.service";
 import { HashService } from "src/encryption/hash.service";
-import { Response } from "express";
+import { TokenPayload } from "./interfaces/token-payload.interface";
+import { CreateUserDto } from "src/user/dtos/create-user.dto";
+import { TokenService } from "./token.service";
+import { MailerService } from "src/mailer/mailer.service";
 import { User } from "generated/prisma";
+import { Response } from "express";
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prismaService: PrismaService,
-    private readonly jwtService: JwtService,
-    private readonly customConfigService: CustomConfigService,
     private readonly userService: UserService,
     private readonly hashService: HashService,
+    private readonly customConfigService: CustomConfigService,
+    private readonly mailerService: MailerService,
+    private readonly tokenService: TokenService,
   ) {}
+
+  async signup(data: CreateUserDto) {
+    try {
+      const newUser = await this.userService.createUser({
+        ...data,
+        password: await this.hashService.hash(data.password),
+      });
+
+      const tokenPayload: TokenPayload = {
+        sub: newUser.id,
+      };
+
+      const { token } =
+        this.tokenService.generateConfirmationToken(tokenPayload);
+
+      const confirmLink = `${this.customConfigService.getServerUrl()}/confirm-email?token=${token}`;
+
+      await this.mailerService.sendEmailConfirmation(
+        newUser.username,
+        newUser.email,
+        confirmLink,
+        "verify-email",
+      );
+
+      return {
+        message: `User ${newUser.username} created, we sent a message to your email: ${newUser.email}, please confirm!`,
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) throw new BadRequestException();
+      throw new InternalServerErrorException();
+    }
+  }
 
   async confirmEmail(token: string) {
     try {
-      const payload: { sub: string } = this.jwtService.verify(token, {
-        secret: this.customConfigService.getJwtConfirmationSecret(),
-      });
+      const payload: { sub: string } = this.tokenService.verifyToken(
+        token,
+        this.customConfigService.getJwtConfirmationSecret(),
+      );
 
-      await this.prismaService.user.update({
-        where: {
-          id: payload.sub,
-        },
-        data: {
-          emailVerified: true,
-        },
-      });
+      await this.userService.markEmailAsVerified(payload.sub);
 
-      return { message: "Email successfully confirmed. You can login now." };
+      return { message: "Email successfully confirmed" };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw new UnauthorizedException("Token invalid or expired!");
@@ -53,17 +81,11 @@ export class AuthService {
     try {
       const user = await this.userService.getUserByEmail(email);
 
-      if (!user) {
-        throw new UnauthorizedException();
-      }
+      const isValid =
+        user && (await this.hashService.compare(password, user.password));
 
-      const passwordMatches = await this.hashService.compare(
-        password,
-        user.password,
-      );
-
-      if (!passwordMatches) {
-        throw new UnauthorizedException();
+      if (!isValid) {
+        throw new UnauthorizedException("Invalid credentials.");
       }
 
       return user;

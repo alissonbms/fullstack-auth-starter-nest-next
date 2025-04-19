@@ -4,10 +4,16 @@ import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { CurrentUser } from "./decorators/current-user.decorator";
 import { User } from "generated/prisma";
 import { Response } from "express";
+import { CreateUserDto } from "src/user/dtos/create-user.dto";
 
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post("signup")
+  async signup(@Body() dto: CreateUserDto) {
+    return await this.authService.signup(dto);
+  }
 
   @Post("confirm-email")
   async confirmEmail(@Body() body: { token: string }) {
