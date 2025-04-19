@@ -1,10 +1,20 @@
-import { Body, Controller, Post, Query, Res, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { CurrentUser } from "./decorators/current-user.decorator";
 import { User } from "generated/prisma";
 import { Response } from "express";
 import { CreateUserDto } from "src/user/dtos/create-user.dto";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { TokenPayload } from "./interfaces/token-payload.interface";
 
 @Controller("auth")
 export class AuthController {
@@ -27,5 +37,11 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     return this.authService.login(user, response);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("me")
+  getMe(@CurrentUser() user: TokenPayload) {
+    return user;
   }
 }

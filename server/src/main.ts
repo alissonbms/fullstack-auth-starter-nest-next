@@ -3,6 +3,7 @@ import { AppModule } from "./app.module";
 import { Logger } from "nestjs-pino";
 import { ValidationPipe } from "@nestjs/common";
 import { CustomConfigService } from "./config/custom-config.service";
+import * as cookieParser from "cookie-parser";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,7 +11,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
-
+  app.use(cookieParser());
   const customConfigService = app.get(CustomConfigService);
   const port = customConfigService.getPort();
 

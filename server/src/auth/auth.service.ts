@@ -13,6 +13,7 @@ import { TokenService } from "./token.service";
 import { MailerService } from "src/mailer/mailer.service";
 import { User } from "generated/prisma";
 import { Response } from "express";
+import * as ms from "ms";
 
 @Injectable()
 export class AuthService {
@@ -99,8 +100,28 @@ export class AuthService {
   }
 
   login(user: User, response: Response) {
-    if (user && response) {
-      return "Start login route";
-    }
+    const tokenPayload: TokenPayload = {
+      sub: user.id,
+    };
+
+    const { token, expiresIn } =
+      this.tokenService.generateAccessToken(tokenPayload);
+
+    const expires = new Date(Date.now() + ms(expiresIn));
+
+    response.cookie("Authentication", token, {
+      secure: true,
+      httpOnly: true,
+      sameSite:
+        this.customConfigService.getNodeEnv() === "development"
+          ? "lax"
+          : "strict",
+      expires,
+      path: "/",
+    });
+
+    return {
+      message: "Login successful.",
+    };
   }
 }

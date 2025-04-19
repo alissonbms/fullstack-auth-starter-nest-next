@@ -47,6 +47,10 @@ export class CustomConfigService {
     return this.configService.getOrThrow<string>("MAIL_FROM");
   }
 
+  getJwtAccessExpiration(): string {
+    return this.configService.getOrThrow<string>("JWT_ACCESS_EXPIRATION");
+  }
+
   getJwtAccessSecret(): string {
     return this.configService.getOrThrow<string>("JWT_ACCESS_SECRET");
   }

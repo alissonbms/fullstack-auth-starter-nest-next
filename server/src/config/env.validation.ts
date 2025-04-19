@@ -53,6 +53,9 @@ class EnvironmentVariables {
   MAIL_FROM: string;
 
   @IsString()
+  JWT_ACCESS_EXPIRATION: string;
+
+  @IsString()
   JWT_ACCESS_SECRET: string;
 
   @IsString()

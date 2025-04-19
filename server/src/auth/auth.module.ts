@@ -6,6 +6,7 @@ import { UserService } from "src/user/user.service";
 import { AuthService } from "./auth.service";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { MailerService } from "src/mailer/mailer.service";
+import { JwtStrategy } from "./strategies/jwt.strategy";
 import { TokenService } from "./token.service";
 import { JwtModule } from "@nestjs/jwt";
 
@@ -17,6 +18,7 @@ import { JwtModule } from "@nestjs/jwt";
     UserService,
     HashService,
     LocalStrategy,
+    JwtStrategy,
     MailerService,
     TokenService,
   ],
