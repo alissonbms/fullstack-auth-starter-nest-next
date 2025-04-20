@@ -17,6 +17,8 @@ import { CreateUserDto } from "src/user/dtos/create-user.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { TokenPayload } from "./interfaces/token-payload.interface";
 import { CustomConfigService } from "src/config/custom-config.service";
+import { EmailDto } from "./dtos/email.dto";
+import { PasswordDto } from "./dtos/password.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -58,6 +60,19 @@ export class AuthController {
     });
 
     return { message: "Logout successful." };
+  }
+
+  @Post("forgot-password")
+  forgotPassword(@Body() emailDto: EmailDto) {
+    return this.authService.forgotPassword(emailDto);
+  }
+
+  @Patch("reset-password")
+  resetPassword(
+    @Query("token") token: string,
+    @Body() passwordDto: PasswordDto,
+  ) {
+    return this.authService.resetPassword(token, passwordDto);
   }
 
   @UseGuards(JwtAuthGuard)

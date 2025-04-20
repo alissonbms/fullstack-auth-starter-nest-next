@@ -14,6 +14,8 @@ import { MailerService } from "src/mailer/mailer.service";
 import { User } from "generated/prisma";
 import { Response } from "express";
 import * as ms from "ms";
+import { EmailDto } from "./dtos/email.dto";
+import { PasswordDto } from "./dtos/password.dto";
 
 @Injectable()
 export class AuthService {
@@ -59,7 +61,7 @@ export class AuthService {
 
   async confirmEmail(token: string) {
     try {
-      const payload: { sub: string } = this.tokenService.verifyToken(
+      const payload: TokenPayload = this.tokenService.verifyToken(
         token,
         this.customConfigService.getJwtConfirmationSecret(),
       );
@@ -128,6 +130,45 @@ export class AuthService {
 
     return {
       message: "Login successful.",
+    };
+  }
+
+  async forgotPassword(emailDto: EmailDto) {
+    const email = emailDto.value;
+    const user = await this.userService.getUserByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException("User not found.");
+    }
+
+    const tokenPayload: TokenPayload = {
+      sub: user.id,
+    };
+
+    const { token } =
+      this.tokenService.generateResetPasswordToken(tokenPayload);
+
+    const resetLink = `${this.customConfigService.getServerUrl()}/auth/reset-password?token=${token}`;
+
+    await this.mailerService.sendPasswordReset(user.username, email, resetLink);
+
+    return {
+      message: `We sent a message to your email: ${email}, please confirm to change your password!`,
+    };
+  }
+
+  async resetPassword(token: string, passwordDto: PasswordDto) {
+    const payload: TokenPayload = this.tokenService.verifyToken(
+      token,
+      this.customConfigService.getJwtResetPasswordSecret(),
+    );
+
+    const hasedPassword = await this.hashService.hash(passwordDto.value);
+
+    await this.userService.changePassword(payload.sub, hasedPassword);
+
+    return {
+      message: "Password changed successfully",
     };
   }
 }

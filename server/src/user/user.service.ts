@@ -39,4 +39,13 @@ export class UserService {
       data: { emailVerified: true },
     });
   }
+
+  async changePassword(id: string, newPassword: string) {
+    await this.prismaService.user.update({
+      where: { id },
+      data: {
+        password: newPassword,
+      },
+    });
+  }
 }
