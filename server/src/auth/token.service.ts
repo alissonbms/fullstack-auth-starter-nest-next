@@ -34,14 +34,8 @@ export class TokenService {
     return this.generateToken(payload, secret, expiresIn);
   }
 
-  generateConfirmationToken(payload: TokenPayload): TokenWithExpiration {
-    const secret = this.customConfigService.getJwtConfirmationSecret();
-    const expiresIn = "1h";
-    return this.generateToken(payload, secret, expiresIn);
-  }
-
-  generateChangeEmailToken(payload: TokenPayload): TokenWithExpiration {
-    const secret = this.customConfigService.getJwtChangeEmailSecret();
+  generateConfirmEmailToken(payload: TokenPayload): TokenWithExpiration {
+    const secret = this.customConfigService.getJwtConfirmEmailSecret();
     const expiresIn = "1h";
     return this.generateToken(payload, secret, expiresIn);
   }

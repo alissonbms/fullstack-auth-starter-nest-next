@@ -9,16 +9,16 @@ export class MailerService {
     username: string,
     email: string,
     confirmLink: string,
-    origin: "verify-email" | "change-email",
+    origin: "first_email_confirmation" | "confirm_email_change",
   ) {
     const message =
-      origin === "verify-email"
+      origin === "first_email_confirmation"
         ? "Please confirm your email by clicking the link below:"
         : "You have requested an email change. Please confirm by clicking the link below:";
     await this.mailerService.sendMail({
       to: email,
       subject:
-        origin === "verify-email"
+        origin === "confirm_email_change"
           ? "Confirm your email."
           : "Confirm email change.",
       template: "./confirm-email",

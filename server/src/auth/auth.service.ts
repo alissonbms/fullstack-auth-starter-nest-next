@@ -39,7 +39,7 @@ export class AuthService {
       };
 
       const { token } =
-        this.tokenService.generateConfirmationToken(tokenPayload);
+        this.tokenService.generateConfirmEmailToken(tokenPayload);
 
       const confirmLink = `${this.customConfigService.getServerUrl()}/auth/confirm-email?token=${token}`;
 
@@ -47,7 +47,7 @@ export class AuthService {
         newUser.username,
         newUser.email,
         confirmLink,
-        "verify-email",
+        "first_email_confirmation",
       );
 
       return {
@@ -63,14 +63,14 @@ export class AuthService {
     try {
       const payload: TokenPayload = this.tokenService.verifyToken(
         token,
-        this.customConfigService.getJwtConfirmationSecret(),
+        this.customConfigService.getJwtConfirmEmailSecret(),
       );
 
       await this.userService.markEmailAsVerified(payload.sub);
 
       return { message: "Email successfully confirmed" };
     } catch (error) {
-      if (error instanceof UnauthorizedException) {
+      if (error) {
         throw new UnauthorizedException("Token invalid or expired!");
       } else if (error instanceof BadRequestException) {
         throw new BadRequestException("Something went wrong!");
@@ -101,10 +101,26 @@ export class AuthService {
     }
   }
 
-  login(user: User, response: Response) {
+  async login(user: User, response: Response) {
     if (!user.emailVerified) {
+      const tokenPayload: TokenPayload = {
+        sub: user.id,
+      };
+
+      const { token } =
+        this.tokenService.generateConfirmEmailToken(tokenPayload);
+
+      const confirmLink = `${this.customConfigService.getServerUrl()}/auth/confirm-email?token=${token}`;
+
+      await this.mailerService.sendEmailConfirmation(
+        user.username,
+        user.email,
+        confirmLink,
+        "first_email_confirmation",
+      );
+
       throw new UnauthorizedException(
-        "Please verify your email before logging in.",
+        "Please verify your email before logging in, we sent a message there.",
       );
     }
 

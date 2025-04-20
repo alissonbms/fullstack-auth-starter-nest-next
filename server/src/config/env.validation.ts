@@ -59,10 +59,7 @@ class EnvironmentVariables {
   JWT_ACCESS_SECRET: string;
 
   @IsString()
-  JWT_CONFIRMATION_SECRET: string;
-
-  @IsString()
-  JWT_CHANGE_EMAIL_SECRET: string;
+  JWT_CONFIRM_EMAIL_SECRET: string;
 
   @IsString()
   JWT_RESET_PASSWORD_SECRET: string;

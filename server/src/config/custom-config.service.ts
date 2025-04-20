@@ -55,12 +55,8 @@ export class CustomConfigService {
     return this.configService.getOrThrow<string>("JWT_ACCESS_SECRET");
   }
 
-  getJwtConfirmationSecret(): string {
-    return this.configService.getOrThrow<string>("JWT_CONFIRMATION_SECRET");
-  }
-
-  getJwtChangeEmailSecret(): string {
-    return this.configService.getOrThrow<string>("JWT_CHANGE_EMAIL_SECRET");
+  getJwtConfirmEmailSecret(): string {
+    return this.configService.getOrThrow<string>("JWT_CONFIRM_EMAIL_SECRET");
   }
 
   getJwtResetPasswordSecret(): string {
