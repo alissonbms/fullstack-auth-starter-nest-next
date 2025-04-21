@@ -10,9 +10,18 @@ import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handleba
 import { PrismaModule } from "./prisma/prisma.module";
 import { join } from "path";
 import { AuthModule } from "./auth/auth.module";
+import { ThrottlerModule } from "@nestjs/throttler";
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60,
+          limit: 10,
+        },
+      ],
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
