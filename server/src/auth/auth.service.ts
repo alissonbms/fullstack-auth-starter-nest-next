@@ -18,6 +18,7 @@ import { EmailDto } from "./dtos/email.dto";
 import { PasswordDto } from "./dtos/password.dto";
 import { ChangeEmailDto } from "./dtos/changeEmail.dto";
 import { ChangePasswordDto } from "./dtos/changePassword.dto";
+import { TokenExpiredError } from "@nestjs/jwt";
 
 @Injectable()
 export class AuthService {
@@ -72,13 +73,10 @@ export class AuthService {
 
       return { message: "Email successfully confirmed" };
     } catch (error) {
-      if (error) {
+      if (error instanceof TokenExpiredError) {
         throw new UnauthorizedException("Token invalid or expired!");
-      } else if (error instanceof BadRequestException) {
-        throw new BadRequestException("Something went wrong!");
-      } else {
-        throw new InternalServerErrorException();
       }
+      throw new InternalServerErrorException();
     }
   }
 
@@ -252,11 +250,10 @@ export class AuthService {
 
       return { message: "Email successfully changed!" };
     } catch (error) {
-      if (error) {
+      if (error instanceof TokenExpiredError) {
         throw new UnauthorizedException("Token invalid or expired!");
-      } else {
-        throw new InternalServerErrorException();
       }
+      throw new InternalServerErrorException();
     }
   }
 
@@ -286,11 +283,10 @@ export class AuthService {
 
       return { message: "Password successfully changed!" };
     } catch (error) {
-      if (error) {
-        throw new UnauthorizedException("You are not authorized!");
-      } else {
-        throw new InternalServerErrorException();
+      if (error instanceof TokenExpiredError) {
+        throw new UnauthorizedException("Token invalid or expired!");
       }
+      throw new InternalServerErrorException();
     }
   }
 }
