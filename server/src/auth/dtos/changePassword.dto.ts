@@ -15,7 +15,7 @@ export class ChangePasswordDto {
     },
     {
       message:
-        "Password must be at least 8 characters long, including numbers, upper and lower case letters, and symbols.",
+        "New password must be at least 8 characters long, including numbers, upper and lower case letters, and symbols.",
     },
   )
   newPassword: string;

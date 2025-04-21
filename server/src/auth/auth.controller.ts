@@ -20,6 +20,7 @@ import { CustomConfigService } from "src/config/custom-config.service";
 import { EmailDto } from "./dtos/email.dto";
 import { PasswordDto } from "./dtos/password.dto";
 import { ChangeEmailDto } from "./dtos/changeEmail.dto";
+import { ChangePasswordDto } from "./dtos/changePassword.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -91,6 +92,15 @@ export class AuthController {
     @Query("token") token: string,
   ) {
     return this.authService.changeEmailConfirm(userId, token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch("change-password")
+  changePassword(
+    @CurrentUser() userId: TokenPayload,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(userId, changePasswordDto);
   }
 
   @UseGuards(JwtAuthGuard)

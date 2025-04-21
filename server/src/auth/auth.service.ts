@@ -17,6 +17,7 @@ import * as ms from "ms";
 import { EmailDto } from "./dtos/email.dto";
 import { PasswordDto } from "./dtos/password.dto";
 import { ChangeEmailDto } from "./dtos/changeEmail.dto";
+import { ChangePasswordDto } from "./dtos/changePassword.dto";
 
 @Injectable()
 export class AuthService {
@@ -249,10 +250,44 @@ export class AuthService {
 
       await this.userService.changeEmail(payload.sub, payload.email);
 
-      return { message: "Email successfully changed, you can login now." };
+      return { message: "Email successfully changed!" };
     } catch (error) {
       if (error) {
         throw new UnauthorizedException("Token invalid or expired!");
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
+  }
+
+  async changePassword(
+    userId: TokenPayload,
+    changePasswordDto: ChangePasswordDto,
+  ) {
+    try {
+      const user = await this.userService.getUserById(userId.sub);
+
+      const isValid =
+        user &&
+        (await this.hashService.compare(
+          changePasswordDto.currentPassword,
+          user.password,
+        ));
+
+      if (!isValid || user.id != userId.sub) {
+        throw new UnauthorizedException("You are not authorized!");
+      }
+
+      const hasedPassword = await this.hashService.hash(
+        changePasswordDto.newPassword,
+      );
+
+      await this.userService.changePassword(userId.sub, hasedPassword);
+
+      return { message: "Password successfully changed!" };
+    } catch (error) {
+      if (error) {
+        throw new UnauthorizedException("You are not authorized!");
       } else {
         throw new InternalServerErrorException();
       }
