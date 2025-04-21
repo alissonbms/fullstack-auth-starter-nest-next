@@ -21,6 +21,7 @@ import { EmailDto } from "./dtos/email.dto";
 import { PasswordDto } from "./dtos/password.dto";
 import { ChangeEmailDto } from "./dtos/changeEmail.dto";
 import { ChangePasswordDto } from "./dtos/changePassword.dto";
+import { Public } from "src/common/decorators/public.decorator";
 
 @Controller("auth")
 export class AuthController {
@@ -29,11 +30,13 @@ export class AuthController {
     private readonly customConfigService: CustomConfigService,
   ) {}
 
+  @Public()
   @Post("signup")
   async signup(@Body() dto: CreateUserDto) {
     return await this.authService.signup(dto);
   }
 
+  @Public()
   @Patch("confirm-email")
   async confirmEmail(@Query("token") token: string) {
     return await this.authService.confirmEmail(token);
@@ -48,6 +51,7 @@ export class AuthController {
     return this.authService.login(user, response);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post("logout")
   logout(@Res({ passthrough: true }) response: Response) {
     response.cookie("Authentication", "", {
@@ -64,11 +68,13 @@ export class AuthController {
     return { message: "Logout successful." };
   }
 
+  @Public()
   @Post("forgot-password")
   forgotPassword(@Body() emailDto: EmailDto) {
     return this.authService.forgotPassword(emailDto);
   }
 
+  @Public()
   @Patch("reset-password")
   resetPassword(
     @Query("token") token: string,
