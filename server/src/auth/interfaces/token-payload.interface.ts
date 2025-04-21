@@ -6,4 +6,7 @@ export interface TokenPayload {
       id: true;
     };
   }>["id"];
+  email?: string;
+  iat?: number;
+  exp?: number;
 }

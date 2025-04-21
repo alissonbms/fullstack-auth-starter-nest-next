@@ -25,6 +25,14 @@ export class UserService {
     }
   }
 
+  async getUserById(id: string) {
+    return this.prismaService.user.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
   async getUserByEmail(email: string) {
     return this.prismaService.user.findUnique({
       where: {
@@ -46,6 +54,13 @@ export class UserService {
       data: {
         password: newPassword,
       },
+    });
+  }
+
+  async changeEmail(id: string, newEmail: string) {
+    await this.prismaService.user.update({
+      where: { id },
+      data: { email: newEmail, emailVerified: true },
     });
   }
 }

@@ -16,6 +16,7 @@ import { Response } from "express";
 import * as ms from "ms";
 import { EmailDto } from "./dtos/email.dto";
 import { PasswordDto } from "./dtos/password.dto";
+import { ChangeEmailDto } from "./dtos/changeEmail.dto";
 
 @Injectable()
 export class AuthService {
@@ -186,5 +187,75 @@ export class AuthService {
     return {
       message: "Password changed successfully",
     };
+  }
+
+  async changeEmailRequest(
+    userId: TokenPayload,
+    changeEmailDto: ChangeEmailDto,
+  ) {
+    const user = await this.userService.getUserById(userId.sub);
+
+    const isValid =
+      user &&
+      (await this.hashService.compare(changeEmailDto.password, user.password));
+
+    if (!isValid) {
+      throw new UnauthorizedException("You are not authorized!");
+    }
+
+    const isEmailAlreadyInUse = await this.userService.getUserByEmail(
+      changeEmailDto.newEmail,
+    );
+
+    if (isEmailAlreadyInUse) {
+      throw new BadRequestException("Email already in use.");
+    }
+
+    const tokenPayload: TokenPayload = {
+      sub: userId.sub,
+      email: changeEmailDto.newEmail,
+    };
+
+    const { token } = this.tokenService.generateConfirmEmailToken(tokenPayload);
+
+    const confirmLink = `${this.customConfigService.getServerUrl()}/auth/change-email-confirm?token=${token}`;
+
+    await this.mailerService.sendEmailConfirmation(
+      user.username,
+      changeEmailDto.newEmail,
+      confirmLink,
+      "confirm_email_change",
+    );
+
+    return {
+      message: `We sent a message to your new email: ${changeEmailDto.newEmail}, please confirm!`,
+    };
+  }
+
+  async changeEmailConfirm(userId: TokenPayload, token: string) {
+    try {
+      const payload: TokenPayload = this.tokenService.verifyToken(
+        token,
+        this.customConfigService.getJwtConfirmEmailSecret(),
+      );
+
+      if (payload.sub != userId.sub) {
+        throw new UnauthorizedException("You are not authorized!");
+      }
+
+      if (!payload.email) {
+        throw new BadRequestException("Missing email property.");
+      }
+
+      await this.userService.changeEmail(payload.sub, payload.email);
+
+      return { message: "Email successfully changed, you can login now." };
+    } catch (error) {
+      if (error) {
+        throw new UnauthorizedException("Token invalid or expired!");
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
   }
 }

@@ -19,6 +19,7 @@ import { TokenPayload } from "./interfaces/token-payload.interface";
 import { CustomConfigService } from "src/config/custom-config.service";
 import { EmailDto } from "./dtos/email.dto";
 import { PasswordDto } from "./dtos/password.dto";
+import { ChangeEmailDto } from "./dtos/changeEmail.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -73,6 +74,23 @@ export class AuthController {
     @Body() passwordDto: PasswordDto,
   ) {
     return this.authService.resetPassword(token, passwordDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post("change-email-request")
+  changeEmailRequest(
+    @CurrentUser() userId: TokenPayload,
+    @Body() changeEmailDto: ChangeEmailDto,
+  ) {
+    return this.authService.changeEmailRequest(userId, changeEmailDto);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Patch("change-email-confirm")
+  changeEmailConfirm(
+    @CurrentUser() userId: TokenPayload,
+    @Query("token") token: string,
+  ) {
+    return this.authService.changeEmailConfirm(userId, token);
   }
 
   @UseGuards(JwtAuthGuard)
