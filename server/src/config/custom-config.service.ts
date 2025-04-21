@@ -51,6 +51,18 @@ export class CustomConfigService {
     return this.configService.getOrThrow<string>("JWT_ACCESS_EXPIRATION");
   }
 
+  getJwtConfirmEmailExpiration(): string {
+    return this.configService.getOrThrow<string>(
+      "JWT_CONFIRM_EMAIL_EXPIRATION",
+    );
+  }
+
+  getJwtResetPasswordExpiration(): string {
+    return this.configService.getOrThrow<string>(
+      "JWT_RESET_PASSWORD_EXPIRATION",
+    );
+  }
+
   getJwtAccessSecret(): string {
     return this.configService.getOrThrow<string>("JWT_ACCESS_SECRET");
   }

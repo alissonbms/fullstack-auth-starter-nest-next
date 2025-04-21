@@ -36,13 +36,13 @@ export class TokenService {
 
   generateConfirmEmailToken(payload: TokenPayload): TokenWithExpiration {
     const secret = this.customConfigService.getJwtConfirmEmailSecret();
-    const expiresIn = "1h";
+    const expiresIn = this.customConfigService.getJwtConfirmEmailExpiration();
     return this.generateToken(payload, secret, expiresIn);
   }
 
   generateResetPasswordToken(payload: TokenPayload): TokenWithExpiration {
     const secret = this.customConfigService.getJwtResetPasswordSecret();
-    const expiresIn = "1h";
+    const expiresIn = this.customConfigService.getJwtResetPasswordExpiration();
     return this.generateToken(payload, secret, expiresIn);
   }
 }
