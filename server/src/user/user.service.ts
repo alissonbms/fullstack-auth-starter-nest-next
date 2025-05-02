@@ -6,6 +6,7 @@ import {
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "generated/prisma/runtime/library";
+import { Prisma } from "generated/prisma";
 
 @Injectable()
 export class UserService {
@@ -27,19 +28,20 @@ export class UserService {
     }
   }
 
-  async getUserById(id: string) {
-    return this.prismaService.user.findUnique({
-      where: {
-        id,
-      },
-    });
-  }
-
-  async getUserByEmail(email: string) {
-    return this.prismaService.user.findUnique({
-      where: {
-        email,
-      },
+  async getUser(
+    filter: Prisma.UserWhereUniqueInput,
+    withPassword: boolean = false,
+  ) {
+    const selectFields = {
+      id: true,
+      username: true,
+      email: true,
+      emailVerified: true,
+      ...(withPassword && { password: true }),
+    };
+    return this.prismaService.user.findUniqueOrThrow({
+      where: filter,
+      select: selectFields,
     });
   }
 

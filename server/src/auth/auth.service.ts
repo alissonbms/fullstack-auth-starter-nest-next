@@ -87,7 +87,7 @@ export class AuthService {
 
   async verifyUser(email: string, password: string) {
     try {
-      const user = await this.userService.getUserByEmail(email);
+      const user = await this.userService.getUser({ email }, true);
 
       const isValid =
         user && (await this.hashService.compare(password, user.password));
@@ -156,7 +156,7 @@ export class AuthService {
 
   async forgotPassword(emailDto: EmailDto) {
     const email = emailDto.value;
-    const user = await this.userService.getUserByEmail(email);
+    const user = await this.userService.getUser({ email });
 
     if (user) {
       const tokenPayload: TokenPayload = {
@@ -199,7 +199,7 @@ export class AuthService {
     userId: TokenPayload,
     changeEmailDto: ChangeEmailDto,
   ) {
-    const user = await this.userService.getUserById(userId.sub);
+    const user = await this.userService.getUser({ id: userId.sub }, true);
 
     const isValid =
       user &&
@@ -209,9 +209,9 @@ export class AuthService {
       throw new UnauthorizedException("You are not authorized!");
     }
 
-    const isEmailAlreadyInUse = await this.userService.getUserByEmail(
-      changeEmailDto.newEmail,
-    );
+    const isEmailAlreadyInUse = await this.userService.getUser({
+      email: changeEmailDto.newEmail,
+    });
 
     if (isEmailAlreadyInUse) {
       throw new UnprocessableEntityException(
@@ -271,7 +271,7 @@ export class AuthService {
     changePasswordDto: ChangePasswordDto,
   ) {
     try {
-      const user = await this.userService.getUserById(userId.sub);
+      const user = await this.userService.getUser({ id: userId.sub }, true);
 
       const isValid =
         user &&
