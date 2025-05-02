@@ -120,3 +120,31 @@
     @apply bg-background text-foreground;
   }
 }
+
+[data-sonner-toaster] {
+  position: fixed !important;
+  margin-inline: auto !important;
+  z-index: 9999 !important;
+  bottom: 50px !important;
+}
+
+[data-sonner-toast] {
+  font-size: 18px !important;
+}
+
+[data-sonner-toast][data-type="error"] svg {
+  color: red !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  border: 2px solid red !important;
+}
+
+[data-sonner-toast][data-type="success"] svg {
+  color: lightgreen !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  border: 2px solid lightgreen !important;
+  font-weight: 800 !important;
+}
