@@ -22,12 +22,14 @@ import { PasswordDto } from "./dtos/password.dto";
 import { ChangeEmailDto } from "./dtos/changeEmail.dto";
 import { ChangePasswordDto } from "./dtos/changePassword.dto";
 import { Public } from "src/common/decorators/public.decorator";
+import { UserService } from "src/user/user.service";
 
 @Controller("auth")
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly customConfigService: CustomConfigService,
+    private readonly userService: UserService,
   ) {}
 
   @Public()
@@ -110,8 +112,8 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get("me")
-  getMe(@CurrentUser() user: TokenPayload) {
-    return user;
+  @Get("session")
+  getSession(@CurrentUser() user: TokenPayload) {
+    return this.userService.getUser({ id: user.sub });
   }
 }
