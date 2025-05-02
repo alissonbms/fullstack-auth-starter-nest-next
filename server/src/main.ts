@@ -12,8 +12,18 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
   app.use(cookieParser());
+
+  app.setGlobalPrefix("api");
+
   const customConfigService = app.get(CustomConfigService);
   const port = customConfigService.getPort();
+
+  app.enableCors({
+    origin: [customConfigService.getClientUrl()],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-SUPPRESS-TOAST"],
+  });
 
   await app.listen(port);
 }
