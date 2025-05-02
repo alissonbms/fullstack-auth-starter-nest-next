@@ -1,9 +1,9 @@
 interface ContainerProps {
   children: React.ReactNode;
-  muted: boolean;
+  muted?: boolean;
 }
 
-const Container = ({ children, muted }: ContainerProps) => {
+const Container = ({ children, muted = true }: ContainerProps) => {
   return (
     <div
       className={`flex h-[100vh] w-[100vw] items-center justify-center ${

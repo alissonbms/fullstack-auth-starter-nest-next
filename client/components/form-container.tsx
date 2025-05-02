@@ -14,6 +14,7 @@ interface FormContainerProps {
   description: string;
   imageAlt: string;
   imagePath: string;
+  customRounded?: boolean;
 }
 
 const FormContainer = ({
@@ -22,11 +23,14 @@ const FormContainer = ({
   description,
   imageAlt,
   imagePath,
+  customRounded = true,
 }: FormContainerProps) => {
   return (
-    <Container muted={true}>
+    <Container>
       <div className="grid w-full max-w-[1200px] px-10 md:min-h-[500px] md:grid-cols-2">
-        <Card className="justify-center gap-10 md:rounded-none md:rounded-l-2xl">
+        <Card
+          className={`justify-center gap-10 ${customRounded ? "md:rounded-none md:rounded-l-2xl" : ""}`}
+        >
           <CardHeader className="flex flex-col items-center gap-2">
             <CardTitle className="text-center text-4xl">{title}</CardTitle>
             <CardDescription className="text-center text-lg">
@@ -36,7 +40,9 @@ const FormContainer = ({
           <CardContent>{children}</CardContent>
         </Card>
 
-        <div className="hidden overflow-hidden md:relative md:block md:rounded-r-2xl">
+        <div
+          className={`hidden overflow-hidden md:relative md:block ${customRounded ? "md:rounded-r-2xl" : ""}`}
+        >
           <Image
             alt={imageAlt}
             src={imagePath}
