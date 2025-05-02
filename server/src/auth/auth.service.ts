@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from "@nestjs/common";
 import { CustomConfigService } from "src/config/custom-config.service";
 import { UserService } from "src/user/user.service";
@@ -54,10 +55,16 @@ export class AuthService {
       );
 
       return {
-        message: `User ${newUser.username} created, we sent a message to your email: ${newUser.email}, please confirm!`,
+        message: `User created, we sent a message to your email, please confirm! ✅`,
       };
     } catch (error) {
-      if (error instanceof BadRequestException) throw new BadRequestException();
+      if (error instanceof UnprocessableEntityException) {
+        console.log(error);
+
+        throw new UnprocessableEntityException(
+          "We couldn't process your request.",
+        );
+      }
       throw new InternalServerErrorException();
     }
   }
@@ -153,23 +160,25 @@ export class AuthService {
     const email = emailDto.value;
     const user = await this.userService.getUserByEmail(email);
 
-    if (!user) {
-      throw new BadRequestException("User not found.");
+    if (user) {
+      const tokenPayload: TokenPayload = {
+        sub: user.id,
+      };
+
+      const { token } =
+        this.tokenService.generateResetPasswordToken(tokenPayload);
+
+      const resetLink = `${this.customConfigService.getServerUrl()}/auth/reset-password?token=${token}`;
+
+      await this.mailerService.sendPasswordReset(
+        user.username,
+        email,
+        resetLink,
+      );
     }
 
-    const tokenPayload: TokenPayload = {
-      sub: user.id,
-    };
-
-    const { token } =
-      this.tokenService.generateResetPasswordToken(tokenPayload);
-
-    const resetLink = `${this.customConfigService.getServerUrl()}/auth/reset-password?token=${token}`;
-
-    await this.mailerService.sendPasswordReset(user.username, email, resetLink);
-
     return {
-      message: `We sent a message to your email: ${email}, please confirm to change your password!`,
+      message: `If an account with the email ${email} exists, a message has been sent with password reset instructions.`,
     };
   }
 
@@ -207,7 +216,9 @@ export class AuthService {
     );
 
     if (isEmailAlreadyInUse) {
-      throw new BadRequestException("Email already in use.");
+      throw new UnprocessableEntityException(
+        "Could not update your information.",
+      );
     }
 
     const tokenPayload: TokenPayload = {
