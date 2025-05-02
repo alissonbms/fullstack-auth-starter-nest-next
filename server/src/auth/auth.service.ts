@@ -59,8 +59,6 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof UnprocessableEntityException) {
-        console.log(error);
-
         throw new UnprocessableEntityException(
           "We couldn't process your request.",
         );

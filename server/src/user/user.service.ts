@@ -19,7 +19,9 @@ export class UserService {
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new UnprocessableEntityException("Email already in use.");
+        throw new UnprocessableEntityException(
+          "We couldn't process your request.",
+        );
       }
       throw new InternalServerErrorException();
     }
