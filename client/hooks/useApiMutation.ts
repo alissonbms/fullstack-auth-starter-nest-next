@@ -18,7 +18,7 @@ export function useApiMutation<TData = unknown, TVariables = unknown>({
     mutationFn,
     onSuccess,
     onError: (error: AxiosError) => {
-      const message = getErrorMessage(error);
+      const { message } = getErrorMessage(error);
 
       if (setFormError) {
         return setFormError(
