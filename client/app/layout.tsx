@@ -32,7 +32,11 @@ export default function RootLayout({
       >
         <Toaster position="top-center" richColors closeButton />
         <SessionErrorToaster />
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="flex min-h-screen min-w-full flex-col">
+            <main className="flex flex-grow py-6">{children}</main>
+          </div>
+        </Providers>
       </body>
     </html>
   );
