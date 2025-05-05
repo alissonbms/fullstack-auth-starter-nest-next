@@ -55,7 +55,7 @@ export class AuthService {
       );
 
       return {
-        message: `User created, we sent a message to your email, please confirm! ✅`,
+        message: `User created, we sent a message to your email, please confirm!`,
       };
     } catch (error) {
       if (error instanceof UnprocessableEntityException) {
