@@ -9,7 +9,7 @@ const CenteredContainer = ({
 }: CenteredContainerProps) => {
   return (
     <div
-      className={`flex h-[100vh] w-[100vw] items-center justify-center ${
+      className={`flex min-h-full min-w-full items-center justify-center ${
         muted ? "bg-muted" : ""
       }`}
     >
