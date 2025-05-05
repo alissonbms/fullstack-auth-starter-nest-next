@@ -2,16 +2,18 @@
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "../lib/queryClient";
-import { Toaster } from "sonner";
 import "./globals.css";
+import { AuthProvider } from "@/contexts/auth-context";
+import { ErrorBoundary } from "@/utils/error-boundary";
 
 interface ProviderProps {
   children: React.ReactNode;
 }
 
 export const Providers = ({ children }: ProviderProps) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-    <Toaster position="bottom-center" />
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>{children}</AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
