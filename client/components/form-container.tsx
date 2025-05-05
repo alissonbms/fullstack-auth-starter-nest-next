@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import Container from "./container";
+import CenteredContainer from "./centered-container";
 
 interface FormContainerProps {
   children: React.ReactNode;
@@ -26,7 +26,7 @@ const FormContainer = ({
   customRounded = true,
 }: FormContainerProps) => {
   return (
-    <Container>
+    <CenteredContainer>
       <div className="grid w-full max-w-[1200px] px-10 md:min-h-[500px] md:grid-cols-2">
         <Card
           className={`justify-center gap-10 ${customRounded ? "md:rounded-none md:rounded-l-2xl" : ""}`}
@@ -51,7 +51,7 @@ const FormContainer = ({
           />
         </div>
       </div>
-    </Container>
+    </CenteredContainer>
   );
 };
 

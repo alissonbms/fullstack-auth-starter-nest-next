@@ -1,9 +1,12 @@
-interface ContainerProps {
+interface CenteredContainerProps {
   children: React.ReactNode;
   muted?: boolean;
 }
 
-const Container = ({ children, muted = true }: ContainerProps) => {
+const CenteredContainer = ({
+  children,
+  muted = true,
+}: CenteredContainerProps) => {
   return (
     <div
       className={`flex h-[100vh] w-[100vw] items-center justify-center ${
@@ -15,4 +18,4 @@ const Container = ({ children, muted = true }: ContainerProps) => {
   );
 };
 
-export default Container;
+export default CenteredContainer;

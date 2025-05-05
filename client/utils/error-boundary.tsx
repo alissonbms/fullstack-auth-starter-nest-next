@@ -1,4 +1,4 @@
-import Container from "@/components/container";
+import CenteredContainer from "@/components/centered-container";
 import React from "react";
 
 type ErrorBoundaryProps = {
@@ -20,14 +20,14 @@ export class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <Container>
+          <CenteredContainer>
             <div className="p-10">
               <p className="text-center text-2xl">
                 An error from server occurred, please contact support if the
                 issue persists. 📩
               </p>
             </div>
-          </Container>
+          </CenteredContainer>
         )
       );
     }
