@@ -8,6 +8,9 @@ interface getErrorMessageReturn {
 
 export const getErrorMessage = (error: unknown): getErrorMessageReturn => {
   const defaultTitle = "Oops! Something went wrong 😬";
+  const defaultMessage =
+    "An error from server occurred, please contact support if the issue persists. 📩";
+
   if (isAxiosError(error)) {
     const responseData = error.response?.data;
     const message = responseData.message;
@@ -28,18 +31,19 @@ export const getErrorMessage = (error: unknown): getErrorMessageReturn => {
 
     return {
       title: defaultTitle,
-      message:
-        "Unknown error from server, please contact support if the issue persists. 📩",
+      message: defaultMessage,
     };
   }
   return {
     title: defaultTitle,
-    message:
-      "An error occurred, please contact support if the issue persists. 📩",
+    message: defaultMessage,
   };
 };
 
-export const handleError = (error: unknown): void => {
+export const handleError = (
+  error?: unknown,
+  customError?: { title: string; message: string; type: "error" | "warning" },
+): void => {
   if (
     isAxiosError(error) &&
     error.config?.headers?.["X-SUPPRESS-TOAST"] === "true"
@@ -47,9 +51,30 @@ export const handleError = (error: unknown): void => {
     return;
   }
 
+  const toastId = customError
+    ? "custom-error-toast-id"
+    : "default-error-toast-id";
+
+  if (customError) {
+    if (customError.type === "error") {
+      toast.error(customError.title, {
+        description: customError.message,
+        id: toastId,
+      });
+    } else {
+      toast.warning(customError.title, {
+        description: customError.message,
+        id: toastId,
+      });
+    }
+
+    return;
+  }
+
   const { title, message } = getErrorMessage(error);
 
   toast.error(title, {
     description: message,
+    id: toastId,
   });
 };
