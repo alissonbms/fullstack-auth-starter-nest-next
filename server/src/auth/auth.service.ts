@@ -209,6 +209,12 @@ export class AuthService {
       throw new UnauthorizedException("You are not authorized!");
     }
 
+    if (user.email === changeEmailDto.newEmail) {
+      throw new UnprocessableEntityException(
+        "The new email must be different from your current one.",
+      );
+    }
+
     const isEmailAlreadyInUse = await this.userService.getUser({
       email: changeEmailDto.newEmail,
     });
