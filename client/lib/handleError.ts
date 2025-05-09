@@ -16,13 +16,6 @@ export const getErrorMessage = (error: unknown): getErrorMessageReturn => {
     const message = responseData.message;
 
     if (responseData && message) {
-      if (error.response?.status === 401) {
-        return {
-          title: "Your session has expired! 🔐",
-          message: "Please do login again to continue.",
-        };
-      }
-
       return {
         title: defaultTitle,
         message: Array.isArray(message) ? message.join(", ") : `${message}`,
