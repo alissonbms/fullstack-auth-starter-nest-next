@@ -1,4 +1,5 @@
 import { useSessionChecker } from "@/hooks/useSessionChecker";
+import { User } from "@/interfaces/user-interface";
 import { api } from "@/lib/api";
 import { handleError } from "@/lib/handleError";
 import { createContext, useContext } from "react";
@@ -11,17 +12,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 interface AuthProviderProps {
   children: React.ReactNode;
+  initialUser?: User | null;
 }
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const {
-    user,
-    isAuthenticated,
-    isLoading,
-    refetchSession,
-    enableSessionCheck,
-    disableSessionCheck,
-  } = useSessionChecker();
+export const AuthProvider = ({
+  children,
+  initialUser = null,
+}: AuthProviderProps) => {
+  const { user, isAuthenticated, isLoading, refetchSession } =
+    useSessionChecker({ initialUser });
 
   const logout = async () => {
     try {
@@ -29,7 +28,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } catch (error) {
       handleError(error);
     } finally {
-      disableSessionCheck();
       await refetchSession();
     }
   };
@@ -41,8 +39,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         isAuthenticated,
         isLoading,
         refetchSession,
-        enableSessionCheck,
-        disableSessionCheck,
         logout,
       }}
     >

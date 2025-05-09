@@ -3,8 +3,13 @@ import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-export const useSessionChecker = () => {
-  const [enabled, setEnabled] = useState(false);
+interface useSessionCheckerProps {
+  initialUser?: User | null;
+}
+export const useSessionChecker = ({
+  initialUser = null,
+}: useSessionCheckerProps) => {
+  const [enabled] = useState(!initialUser);
 
   const { data, isLoading, refetch } = useQuery<User | null>({
     queryKey: ["session"],
@@ -12,8 +17,10 @@ export const useSessionChecker = () => {
       const res = await api.get("/auth/session");
       return res.data;
     },
+    initialData: initialUser,
     retry: 0,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 2,
+    refetchInterval: 1000 * 60 * 2,
     enabled,
   });
 
@@ -21,8 +28,6 @@ export const useSessionChecker = () => {
     user: data ?? null,
     isAuthenticated: !!data,
     isLoading,
-    enableSessionCheck: () => setEnabled(true),
-    disableSessionCheck: () => setEnabled(false),
     refetchSession: refetch,
   };
 };
