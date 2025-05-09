@@ -54,6 +54,15 @@ export class UserService {
     });
   }
 
+  async changeUsername(id: string, newUsername: string) {
+    await this.prismaService.user.update({
+      where: { id },
+      data: {
+        username: newUsername,
+      },
+    });
+  }
+
   async changePassword(id: string, newPassword: string) {
     await this.prismaService.user.update({
       where: { id },
