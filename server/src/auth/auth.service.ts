@@ -20,6 +20,10 @@ import { ChangeEmailDto } from "./dtos/changeEmail.dto";
 import { ChangePasswordDto } from "./dtos/changePassword.dto";
 import { TokenExpiredError } from "@nestjs/jwt";
 import { CloudinaryService } from "src/cloudinary/cloudinary.service";
+import {
+  ActionType,
+  ChangeProfileImageDto,
+} from "./dtos/change-profile-image.dto";
 import { User } from "generated/prisma";
 
 @Injectable()
@@ -321,6 +325,71 @@ export class AuthService {
       await this.userService.changePassword(userId.sub, hasedPassword);
 
       return { message: "Password successfully changed!" };
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new UnauthorizedException("Token invalid or expired!");
+      }
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : "Unexpected error",
+      );
+    }
+  }
+
+  async changeProfileImage(
+    userId: TokenPayload,
+    changeProfileImageDto: ChangeProfileImageDto,
+    file?: Express.Multer.File,
+  ) {
+    try {
+      const user = await this.userService.getUser({ id: userId.sub }, true);
+
+      const isValid =
+        user &&
+        (await this.hashService.compare(
+          changeProfileImageDto.password,
+          user.password,
+        ));
+
+      if (!isValid || user.id != userId.sub) {
+        throw new UnauthorizedException("You are not authorized!");
+      }
+
+      if (changeProfileImageDto.action === ActionType.DELETE) {
+        if (!user.profileImage) {
+          throw new BadRequestException("No profile image to delete");
+        }
+
+        const response = await this.cloudinaryService.delete(user.profileImage);
+
+        if (response.success === false) {
+          throw new BadRequestException(response.error);
+        }
+
+        await this.userService.changeProfileImage(userId.sub, "delete");
+
+        return { message: "Profile image updated successfully" };
+      }
+
+      if (!file) {
+        throw new BadRequestException("No file provided for upload");
+      }
+
+      const response = await this.cloudinaryService.upload(
+        [file],
+        `${this.customConfigService.getCloudinaryFolder()}/profile_images`,
+      );
+
+      if (response.success === false) {
+        throw new BadRequestException(response.error);
+      }
+
+      await this.userService.changeProfileImage(
+        userId.sub,
+        "update",
+        response.data[0].secure_url,
+      );
+
+      return { message: "Profile image updated successfully" };
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         throw new UnauthorizedException("Token invalid or expired!");

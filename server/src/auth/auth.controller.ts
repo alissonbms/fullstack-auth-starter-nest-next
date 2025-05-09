@@ -26,6 +26,7 @@ import { ChangePasswordDto } from "./dtos/changePassword.dto";
 import { Public } from "src/common/decorators/public.decorator";
 import { UserService } from "src/user/user.service";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ChangeProfileImageDto } from "./dtos/change-profile-image.dto";
 import { User } from "generated/prisma";
 
 @Controller("auth")
@@ -133,6 +134,37 @@ export class AuthController {
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     return this.authService.changePassword(userId, changePasswordDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch("change-profile-image")
+  @UseInterceptors(
+    FileInterceptor("profileImage", {
+      limits: { fileSize: 2 * 1024 * 1024 },
+      fileFilter: (_req, file, cb) => {
+        const isValid = ["image/jpeg", "image/png"].includes(file.mimetype);
+
+        if (!isValid) {
+          return cb(
+            new BadRequestException("Only JPEG or PNG images are allowed."),
+            false,
+          );
+        }
+
+        cb(null, true);
+      },
+    }),
+  )
+  changeProfileImage(
+    @CurrentUser() userId: TokenPayload,
+    @Body() changeProfileImageDto: ChangeProfileImageDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.authService.changeProfileImage(
+      userId,
+      changeProfileImageDto,
+      file,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

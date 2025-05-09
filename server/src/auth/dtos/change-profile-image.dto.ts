@@ -1,6 +1,6 @@
 import { IsEnum, IsIn, IsNotEmpty } from "class-validator";
 
-enum ActionType {
+export enum ActionType {
   UPDATE = "update",
   DELETE = "delete",
 }
