@@ -27,6 +27,7 @@ import { Public } from "src/common/decorators/public.decorator";
 import { UserService } from "src/user/user.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ChangeProfileImageDto } from "./dtos/change-profile-image.dto";
+import { ChangeUsernameDto } from "./dtos/change-username.dto";
 import { User } from "generated/prisma";
 
 @Controller("auth")
@@ -108,6 +109,15 @@ export class AuthController {
     @Body() passwordDto: PasswordDto,
   ) {
     return this.authService.resetPassword(token, passwordDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch("change-username")
+  changeUsername(
+    @CurrentUser() userId: TokenPayload,
+    @Body() changeUsernameDto: ChangeUsernameDto,
+  ) {
+    return this.authService.changeUsername(userId, changeUsernameDto);
   }
 
   @UseGuards(JwtAuthGuard)

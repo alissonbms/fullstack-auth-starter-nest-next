@@ -24,6 +24,7 @@ import {
   ActionType,
   ChangeProfileImageDto,
 } from "./dtos/change-profile-image.dto";
+import { ChangeUsernameDto } from "./dtos/change-username.dto";
 import { User } from "generated/prisma";
 
 @Injectable()
@@ -219,6 +220,40 @@ export class AuthService {
     return {
       message: "Password changed successfully",
     };
+  }
+
+  async changeUsername(
+    userId: TokenPayload,
+    changeUsernameDto: ChangeUsernameDto,
+  ) {
+    try {
+      const user = await this.userService.getUser({ id: userId.sub }, true);
+
+      const isValid =
+        user &&
+        (await this.hashService.compare(
+          changeUsernameDto.password,
+          user.password,
+        ));
+
+      if (!isValid || user.id != userId.sub) {
+        throw new UnauthorizedException("You are not authorized!");
+      }
+
+      await this.userService.changeUsername(
+        userId.sub,
+        changeUsernameDto.username,
+      );
+
+      return { message: "Username successfully changed!" };
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new UnauthorizedException("Token invalid or expired!");
+      }
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : "Unexpected error",
+      );
+    }
   }
 
   async changeEmailRequest(
