@@ -63,6 +63,18 @@ class EnvironmentVariables {
 
   @IsString()
   JWT_RESET_PASSWORD_SECRET: string;
+
+  @IsString()
+  CLOUDINARY_CLOUD_NAME: string;
+
+  @IsString()
+  CLOUDINARY_API_KEY: string;
+
+  @IsString()
+  CLOUDINARY_API_SECRET: string;
+
+  @IsString()
+  CLOUDINARY_FOLDER: string;
 }
 
 function formatErrors(errors: ValidationError[]): string {

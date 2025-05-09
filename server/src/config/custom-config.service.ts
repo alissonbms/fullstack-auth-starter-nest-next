@@ -74,4 +74,20 @@ export class CustomConfigService {
   getJwtResetPasswordSecret(): string {
     return this.configService.getOrThrow<string>("JWT_RESET_PASSWORD_SECRET");
   }
+
+  getCloudinaryCloudName(): string {
+    return this.configService.getOrThrow<string>("CLOUDINARY_CLOUD_NAME");
+  }
+
+  getCloudinaryApiKey(): string {
+    return this.configService.getOrThrow<string>(" CLOUDINARY_API_KEY");
+  }
+
+  getCloudinaryApiSecret(): string {
+    return this.configService.getOrThrow<string>("CLOUDINARY_API_SECRET");
+  }
+
+  getCloudinaryFolder(): string {
+    return this.configService.getOrThrow<string>("CLOUDINARY_FOLDER");
+  }
 }
