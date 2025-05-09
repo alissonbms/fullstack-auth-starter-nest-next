@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   UnprocessableEntityException,
@@ -66,6 +67,22 @@ export class UserService {
     await this.prismaService.user.update({
       where: { id },
       data: { email: newEmail, emailVerified: true },
+    });
+  }
+
+  async changeProfileImage(
+    id: string,
+    action: "update" | "delete",
+    profileImage?: string,
+  ) {
+    if (action === "update" && !profileImage) {
+      throw new BadRequestException(
+        "No file provided for update profile image",
+      );
+    }
+    await this.prismaService.user.update({
+      where: { id },
+      data: { profileImage: action === "delete" ? null : profileImage },
     });
   }
 }
