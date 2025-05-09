@@ -35,6 +35,7 @@ export class UserService {
     const selectFields = {
       id: true,
       username: true,
+      profileImage: true,
       email: true,
       emailVerified: true,
       ...(withPassword && { password: true }),
