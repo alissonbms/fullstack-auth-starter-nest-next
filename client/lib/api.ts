@@ -9,7 +9,11 @@ export const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    handleError(error);
+    const isSessionCheck = error.config?.url?.includes("/auth/session");
+
+    if (!isSessionCheck) {
+      handleError(error);
+    }
 
     return Promise.reject(error);
   },
