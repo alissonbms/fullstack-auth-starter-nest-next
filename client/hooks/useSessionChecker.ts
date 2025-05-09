@@ -1,6 +1,8 @@
 import { User } from "@/interfaces/user-interface";
 import { api } from "@/lib/api";
+import { handleError } from "@/lib/handleError";
 import { useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { useState } from "react";
 
 interface useSessionCheckerProps {
@@ -14,8 +16,20 @@ export const useSessionChecker = ({
   const { data, isLoading, refetch } = useQuery<User | null>({
     queryKey: ["session"],
     queryFn: async () => {
-      const res = await api.get("/auth/session");
-      return res.data;
+      try {
+        const res = await api.get("/auth/session");
+        return res.data;
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          const isSessionCheck = error.config?.url?.includes("/auth/session");
+
+          if (!isSessionCheck) {
+            handleError(error);
+          }
+
+          return null;
+        }
+      }
     },
     initialData: initialUser,
     retry: 0,
