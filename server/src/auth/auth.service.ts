@@ -12,7 +12,6 @@ import { TokenPayload } from "./interfaces/token-payload.interface";
 import { CreateUserDto } from "src/user/dtos/create-user.dto";
 import { TokenService } from "./token.service";
 import { MailerService } from "src/mailer/mailer.service";
-import { User } from "generated/prisma";
 import { Response } from "express";
 import * as ms from "ms";
 import { EmailDto } from "./dtos/email.dto";
@@ -20,21 +19,38 @@ import { PasswordDto } from "./dtos/password.dto";
 import { ChangeEmailDto } from "./dtos/changeEmail.dto";
 import { ChangePasswordDto } from "./dtos/changePassword.dto";
 import { TokenExpiredError } from "@nestjs/jwt";
+import { CloudinaryService } from "src/cloudinary/cloudinary.service";
+import { User } from "generated/prisma";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
+    private readonly cloudinaryService: CloudinaryService,
     private readonly hashService: HashService,
     private readonly customConfigService: CustomConfigService,
     private readonly mailerService: MailerService,
     private readonly tokenService: TokenService,
   ) {}
 
-  async signup(data: CreateUserDto) {
+  async signup(data: CreateUserDto, file: Express.Multer.File | undefined) {
     try {
+      const response = file
+        ? await this.cloudinaryService.upload(
+            [file],
+            `${this.customConfigService.getCloudinaryFolder()}/profile_images`,
+          )
+        : undefined;
+
+      if (response?.success === false) {
+        throw new BadRequestException(response.error);
+      }
+
+      const profileImage = response?.data?.[0]?.secure_url;
+
       const newUser = await this.userService.createUser({
         ...data,
+        ...(profileImage && { profileImage }),
         password: await this.hashService.hash(data.password),
       });
 
@@ -63,7 +79,9 @@ export class AuthService {
           "We couldn't process your request.",
         );
       }
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : "Unexpected error",
+      );
     }
   }
 
@@ -81,7 +99,9 @@ export class AuthService {
       if (error instanceof TokenExpiredError) {
         throw new UnauthorizedException("Token invalid or expired!");
       }
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : "Unexpected error",
+      );
     }
   }
 
@@ -101,7 +121,9 @@ export class AuthService {
       if (error instanceof UnauthorizedException) {
         throw new UnauthorizedException("Invalid credentials.");
       } else {
-        throw new InternalServerErrorException();
+        throw new InternalServerErrorException(
+          error instanceof Error ? error.message : "Unexpected error",
+        );
       }
     }
   }
@@ -268,7 +290,9 @@ export class AuthService {
       if (error instanceof TokenExpiredError) {
         throw new UnauthorizedException("Token invalid or expired!");
       }
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : "Unexpected error",
+      );
     }
   }
 
@@ -301,7 +325,9 @@ export class AuthService {
       if (error instanceof TokenExpiredError) {
         throw new UnauthorizedException("Token invalid or expired!");
       }
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException(
+        error instanceof Error ? error.message : "Unexpected error",
+      );
     }
   }
 }

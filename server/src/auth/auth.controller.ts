@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -6,12 +7,13 @@ import {
   Post,
   Query,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { CurrentUser } from "./decorators/current-user.decorator";
-import { User } from "generated/prisma";
 import { Response } from "express";
 import { CreateUserDto } from "src/user/dtos/create-user.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
@@ -23,6 +25,8 @@ import { ChangeEmailDto } from "./dtos/changeEmail.dto";
 import { ChangePasswordDto } from "./dtos/changePassword.dto";
 import { Public } from "src/common/decorators/public.decorator";
 import { UserService } from "src/user/user.service";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { User } from "generated/prisma";
 
 @Controller("auth")
 export class AuthController {
@@ -34,8 +38,28 @@ export class AuthController {
 
   @Public()
   @Post("signup")
-  async signup(@Body() dto: CreateUserDto) {
-    return await this.authService.signup(dto);
+  @UseInterceptors(
+    FileInterceptor("profileImage", {
+      limits: { fileSize: 2 * 1024 * 1024 },
+      fileFilter: (_req, file, cb) => {
+        const isValid = ["image/jpeg", "image/png"].includes(file.mimetype);
+
+        if (!isValid) {
+          return cb(
+            new BadRequestException("Only JPEG or PNG images are allowed."),
+            false,
+          );
+        }
+
+        cb(null, true);
+      },
+    }),
+  )
+  async signup(
+    @Body() dto: CreateUserDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return await this.authService.signup(dto, file);
   }
 
   @Public()

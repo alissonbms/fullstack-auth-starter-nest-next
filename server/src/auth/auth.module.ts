@@ -9,9 +9,10 @@ import { MailerService } from "src/mailer/mailer.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { TokenService } from "./token.service";
 import { JwtModule } from "@nestjs/jwt";
+import { CloudinaryModule } from "src/cloudinary/cloudinary.module";
 
 @Module({
-  imports: [JwtModule.register({})],
+  imports: [JwtModule.register({}), CloudinaryModule],
   providers: [
     AuthService,
     CustomConfigService,
