@@ -1,12 +1,16 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsStrongPassword,
   MaxLength,
   MinLength,
 } from "class-validator";
 
 export class CreateUserDto {
+  @IsOptional()
+  profileImage: string;
+
   @IsNotEmpty({ message: "Username must not be empty." })
   @MinLength(3, { message: "Username must be at least 3 characters." })
   @MaxLength(20, {
