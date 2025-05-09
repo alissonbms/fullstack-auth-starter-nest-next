@@ -24,7 +24,7 @@ export const AuthProvider = ({
 
   const logout = async () => {
     try {
-      await api.post("auth/logout");
+      await api.post("/auth/logout");
     } catch (error) {
       handleError(error);
     } finally {
